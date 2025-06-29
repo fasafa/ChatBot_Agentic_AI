@@ -78,10 +78,10 @@ ChatBot_Agentic_AI/
 
 1. **Clone the repo**
 
-```bash
-git clone https://github.com/fasafa/ChatBot_Agentic_AI.git
-cd ChatBot_Agentic_AI
-```
+   ```bash
+   git clone https://github.com/fasafa/ChatBot_Agentic_AI.git
+   cd ChatBot_Agentic_AI
+   ```
 
 2. **Create virtual environment**
 
@@ -89,6 +89,28 @@ cd ChatBot_Agentic_AI
    python -m venv myenv
    source myenv/bin/activate  # On Windows: myenv\Scripts\activate
    ```
+
+3. **Install dependencies**
+
+   ```bash
+      pip install -r requirements.txt
+   ```
+
+4. **Create .env file**
+   ```
+       GOOGLE_API_KEY=your_gemini_api_key_here
+   ```
+5. **Start the server**
+   ```
+      cd backend
+      python main.py
+   ```
+6. **Visit the chatbot**
+    Open browser: http://localhost:8000
+
+
+   
+
 
 
 
