@@ -28,3 +28,58 @@ This project is an intelligent **chatbot assistant** built for an educational in
 
 ## 🗂 Folder Structure
 
+ChatBot_Agentic_AI/
+│
+├── backend/
+│ ├── main.py # Main FastAPI server with agent + tool
+│ ├── utils.py # (optional) Helper functions
+│ ├── mba_applications.txt # File to store MBA form data
+│ ├── faiss_index/ # Stored FAISS vector store
+│
+├── frontend/
+│ ├── index.html # Frontend chatbot UI
+│ └── style.css # Optional CSS styling
+│
+├── data.txt # Text document with college info
+├── requirements.txt # Python package dependencies
+└── README.md # You're reading this!
+
+
+
+---
+
+##  How It Works
+
+1. **Startup**:
+   - `data.txt` is split into chunks and embedded into FAISS.
+   - A retriever fetches relevant chunks based on query similarity.
+
+2. **Agent**:
+   - User query is routed through an **agent**.
+   - The agent uses a Gemini-powered LLM.
+   - If it detects MBA interest, it calls the `ApplyMBA` tool to collect details.
+
+3. **MBA Application Tool**:
+   - Stores name, email, phone, address, qualification, and age to a file.
+
+---
+
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+
+- Python 3.9+
+- Google Gemini API key
+- `data.txt` file with your institution's info
+
+---
+
+### 🛠️ Installation
+
+1. **Clone the repo**
+
+```bash
+git clone https://github.com/your-username/ChatBot_Agentic_AI.git
+cd ChatBot_Agentic_AI
+
+
