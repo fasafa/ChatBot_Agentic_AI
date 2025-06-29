@@ -106,7 +106,7 @@ ChatBot_Agentic_AI/
       python main.py
    ```
 6. **Visit the chatbot**
-    Open browser: http://localhost:8000
+    Open browser: http://localhost:8000 
 
 
    
