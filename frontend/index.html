@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Chatbot</title>
+  <style>
+    #chatIcon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4CAF50;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      color: white;
+      text-align: center;
+      line-height: 60px;
+      cursor: pointer;
+      font-size: 30px;
+    }
+    #chatBox {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #chatMessages {
+      height: 250px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    #chatForm {
+      display: flex;
+    }
+    #userInput {
+      flex: 1;
+      padding: 5px;
+    }
+    #submitBtn {
+      padding: 5px 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chatIcon" onclick="toggleChat()">💬</div>
+  <div id="chatBox">
+    <div id="chatMessages"></div>
+    <form id="chatForm">
+      <input type="text" id="userInput" required placeholder="Ask me anything..." />
+      <button type="submit" id="submitBtn">Send</button>
+    </form>
+  </div>
+
+  <script>
+    function toggleChat() {
+      const chatBox = document.getElementById("chatBox");
+      chatBox.style.display = chatBox.style.display === "none" ? "block" : "none";
+    }
+
+    document.getElementById("chatForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const input = document.getElementById("userInput");
+      const message = input.value;
+      const chatMessages = document.getElementById("chatMessages");
+
+      chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+      input.value = "";
+
+      const formData = new FormData();
+      formData.append("query", message);
+
+      const response = await fetch("/chat", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      chatMessages.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+    });
+  </script>
+</body>
+</html>

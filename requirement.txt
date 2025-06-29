@@ -1,0 +1,8 @@
+langchain
+fastapi
+uvicorn
+langchain
+faiss-cpu
+google-generativeai
+python-multipart
+aiofiles
