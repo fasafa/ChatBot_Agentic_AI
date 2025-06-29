@@ -79,7 +79,7 @@ ChatBot_Agentic_AI/
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/your-username/ChatBot_Agentic_AI.git
+git clone https://github.com/fasafa/ChatBot_Agentic_AI.git
 cd ChatBot_Agentic_AI
 
 
