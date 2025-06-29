@@ -10,14 +10,15 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.schema.output_parser import StrOutputParser
+from langchain.agents import Tool, create_tool_calling_agent, AgentExecutor
 
 import os
 
 # ========== Load Environment Variables ==========
 load_dotenv()
-API_KEY = os.getenv("GOOGLE_API_KEY") or "AIzaSyDRYFJnN0kIEkkJHGdk-3trviIG5_WWR78"  # fallback if .env not set
+API_KEY = os.getenv("GOOGLE_API_KEY") or "your_fallback_api_key_here"
 
 # ========== FastAPI Setup ==========
 app = FastAPI()
@@ -41,24 +42,42 @@ else:
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-# ========== Prompt Template ==========
-prompt_template = ChatPromptTemplate.from_template("""
-You are a helpful assistant for college-related queries. Use the following context to answer:
+# ========== MBA Application Tool ==========
+def collect_mba_application(data: str) -> str:
+    with open("mba_applications.txt", "a", encoding="utf-8") as f:
+        f.write(data + "\n\n")
+    return "✅ Your MBA application has been received. We'll contact you soon."
 
-Context:
-{context}
+mba_application_tool = Tool(
+    name="ApplyMBA",
+    func=collect_mba_application,
+    description=(
+        "Use this tool when the user says they want to apply for MBA. "
+        "Ask their name, email, phone number, address, qualification, and age. "
+        "Once collected, pass all details as a single string to this tool."
+    )
+)
 
-Question:
-{question} #system
-
-Please respond in no more than 1 line. Be clear and direct.
-""")
-output_parser = StrOutputParser()
-
+# ========== LLM + Prompt ==========
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=API_KEY)
-chain = prompt_template | llm | output_parser 
 
-# ========== Endpoints ==========
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant for college queries. Use tools when needed."),
+    MessagesPlaceholder(variable_name="chat_history"),
+    ("human", "{input}"),
+    MessagesPlaceholder(variable_name="agent_scratchpad"),
+])
+
+# ========== Agent Setup ==========
+agent = create_tool_calling_agent(
+    llm=llm,
+    tools=[mba_application_tool],
+    prompt=prompt,
+)
+
+agent_executor = AgentExecutor(agent=agent, tools=[mba_application_tool], verbose=True)
+
+# ========== Routes ==========
 @app.get("/", response_class=HTMLResponse)
 async def serve_home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -70,12 +89,13 @@ async def chat_with_bot(query: str = Form(...)):
         context_docs = retriever.invoke(query)
         context = "\n\n".join([doc.page_content for doc in context_docs])
 
-        response = chain.invoke({"context": context, "question": query})
-        return JSONResponse(content={"response": response})
+        full_query = f"{query}\n\nRelevant college context:\n{context}"
+        response = agent_executor.invoke({"input": full_query, "chat_history": []})
+        return JSONResponse(content={"response": response["output"]})
     except Exception as e:
-        return JSONResponse(content={"response": "Sorry, I don't have enough information to answer that."})
+        return JSONResponse(content={"response": "Sorry, something went wrong."})
 
-# ========== Run App ==========
+# ========== Run ==========
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
