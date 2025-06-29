@@ -80,13 +80,13 @@ ChatBot_Agentic_AI/
 
 ```bash
 git clone https://github.com/fasafa/ChatBot_Agentic_AI.git
-cd ChatBot_Agentic_AI
+cd ChatBot_Agentic_AI```
 
 2. **Create virtual environment**
 
    ```bash
    python -m venv myenv
-   source myenv/bin/activate  # On Windows: myenv\Scripts\activate
+   source myenv/bin/activate  # On Windows: myenv\Scripts\activate```
 
 
 
